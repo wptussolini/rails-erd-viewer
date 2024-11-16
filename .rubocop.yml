@@ -1,0 +1,15 @@
+require:
+  - rubocop-performance
+  - rubocop-rspec
+AllCops:
+  TargetRubyVersion: 2.5
+  NewCops: enable
+
+Style/Documentation:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
