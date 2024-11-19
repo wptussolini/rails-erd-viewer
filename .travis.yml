@@ -16,3 +16,11 @@ env:
   - 'TEST_RAILS_VERSION="~> 6.1.7"'
   - 'TEST_RAILS_VERSION="~> 7.2.2"'
   - 'TEST_RAILS_VERSION="~> 8.0.0"'
+
+script:
+  - bundle exec rake test
+  - rubocop app lib --fail-level R
+
+matrix:
+  allow_failures:
+    - env: "RAILS_VERSION=master"
