@@ -50,3 +50,13 @@ jobs:
         run: |
           echo Ruby  ${{ matrix.ruby  }}
           echo Rails ${{ matrix.rails }}
+
+      - name: Analyze code
+        run: bundle exec rubocop
+
+      - name: Setup DB, Run tests
+        env:
+          RAILS_ENV: test
+        run: |
+          bin/rails db:create db:schema:load
+          bundle exec rspec
