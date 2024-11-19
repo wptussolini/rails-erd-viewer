@@ -1,4 +1,6 @@
 # Rails ERD Viewer
+[![Build Status](https://travis-ci.org/USERNAME/REPO_NAME.svg?branch=master)](https://travis-ci.org/USERNAME/REPO_NAME)
+[![codecov](https://codecov.io/github/wptussolini/rails_erd_viewer/graph/badge.svg?token=LD8Y929EFI)](https://codecov.io/github/wptussolini/rails_erd_viewer)
 
 Rails ERD Viewer automatically generates Entity-Relationship Diagrams from your ActiveRecord and displays them
 using [erd-editor](https://github.com/dineug/erd-editor).
