@@ -1,11 +1,17 @@
 source 'http://rubygems.org'
 gemspec
 
-rails_version = ENV['TEST_RAILS_VERSION'] || '~> 8.0.0'
-
 group :development, :test do
+  case rails_version = ENV.fetch('RAILS_VERSION', nil)
+  when nil
+    gem 'rails'
+  when 'edge'
+    gem 'rails', github: 'rails/rails'
+  else
+    gem 'rails', "~> #{rails_version}.0"
+  end
+
   gem 'codecov', '~> 0.6'
-  gem 'rails', rails_version
   gem 'rails-controller-testing'
   gem 'rake', '~> 13.0'
   gem 'rspec', '~> 3.13'

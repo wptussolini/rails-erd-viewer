@@ -30,7 +30,8 @@ jobs:
           # Edge
           - { ruby: 'head', rails: 'edge', allow-fail: true }
           # Outdated
-          - { ruby: '3.0',  rails: '7.1' }
+          - { ruby: '3.6',  rails: '8' }
+          - { ruby: '3.0',  rails: '7.2' }
           - { ruby: '2.7',  rails: '6'   }
           - { ruby: '2.6',  rails: '6'   }
           - { ruby: '2.5',  rails: '6'   }
@@ -38,12 +39,6 @@ jobs:
 
     env:
       RAILS_VERSION: "${{ matrix.rails }}"
-
-    services:
-      mongodb:
-        image: mongo
-        ports:
-          - 27017:27017
 
     steps:
       - uses: actions/checkout@v4
