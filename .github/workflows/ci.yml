@@ -1,62 +1,84 @@
----
-name: CI
-
+name: "Project Pipeline"
 on:
   push:
     branches:
       - main
-  pull_request:
-
-permissions:
-  contents: read
 
 jobs:
-  rspec:
-    name: >-
-      rspec (${{ matrix.ruby }})
-
+  setup:
+    name: Set Branch and Commit
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby:
-          - 3.3
-          - 3.2
-          - 3.1
-        rails:
-          - 7.2
-        include:
-          # Edge
-          - { ruby: 'head', rails: 'edge', allow-fail: true }
-          # Outdated
-          - { ruby: '3.0',  rails: '7.1' }
-
-    env:
-      RAILS_VERSION: "${{ matrix.rails }}"
-
+    outputs:
+      branch_name: ${{ steps.branch_step.outputs.branch_name }}
+      commit_hash: ${{ steps.commit_step.outputs.commit_hash }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v2
+      - name: Set Branch Name
+        id: branch_step
+        run: echo ::set-output name=branch_name::${GITHUB_REF#refs/*/}
+      - name: Set Commit Hash
+        id: commit_step
+        run: |
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+          echo "::set-output name=commit_hash::$(git rev-parse HEAD)"
+      - name: Echo Branch Name And Commit Hash
+        run: |
+          echo ${{ steps.branch_step.outputs.branch_name }}
+          echo ${{ steps.commit_step.outputs.commit_hash }}
+      - uses: nelonoel/branch-name@v1.0.1
+      - run: echo ${BRANCH_NAME}
 
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.ruby }}
-          rubygems: latest
-          bundler-cache: true
-
-      - name: >-
-          Test ${{ steps.test.outcome }}
+          ruby-version: 3.3.5
+      - name: Ruby gem cache
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+      - name: Install gems
         run: |
-          echo Ruby  ${{ matrix.ruby  }}
-          echo Rails ${{ matrix.rails }}
-
-      - name: Analyze code
-        run: bundle exec rubocop
-
-      - name: Setup DB, Run tests
-        env:
-          RAILS_ENV: test
+          bundle install
+      - name: Run linters
         run: |
-          bin/rails db:create db:schema:load
+          bundle exec rubocop --parallel
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+      TEST_ENV_NUMBER: 2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.6
+      - name: Ruby gem cache
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+      - name: Install gems
+        run: |
+          bundle install --jobs 4 --retry 3
+      - name: Run tests
+        run: |
           bundle exec rspec
+      - name: Upload coverage results
+        uses: actions/upload-artifact@master
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage
