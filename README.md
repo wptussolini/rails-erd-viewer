@@ -11,7 +11,7 @@ Add this to the development group in your `Gemfile`:
 
 ```ruby
 group :development do
-  gem 'rails_erd_viewer', '~> 0.1.0'
+  gem 'rails_erd_viewer', '~> 0.1.2'
 end
 ```
 

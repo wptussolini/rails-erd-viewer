@@ -13,11 +13,7 @@ Gem::Specification.new do |spec|
   spec.license = 'MIT'
   spec.platform = Gem::Platform::RUBY
   spec.required_ruby_version = '>= 2.5.0'
-  spec.files = Dir['README.md', 'LICENSE',
-                   'CHANGELOG.md', 'lib/**/*.rb',
-                   'lib/**/*.rake',
-                   'rails_erd_viewer.gemspec', '.github/*.md',
-                   'Gemfile', 'Rakefile']
+  spec.files = Dir["{app,config,lib}/**/*"]
   spec.extra_rdoc_files = ['README.md']
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
